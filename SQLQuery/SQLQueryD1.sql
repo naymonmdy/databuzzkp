@@ -1,5 +1,13 @@
-SELECT 'Nay Mon'
+SELECT 'Nay Mon' AS "Name",
+		'MEAL and Digital Tool Officer' AS 'Position',
+		'Union INGO' AS 'Organization';
 
-SELECT 'Nay' AS FirstName,'Mon' AS LastName
 
-SELECT 'Lay' AS "MiddleName"
+USE AdventureWorks2022;
+
+SELECT 4*5;
+
+SELECT * FROM [AdventureWorks2022].[HumanResources].Employee;
+
+Select BusinessEntityID, FirstName,LastName,'Databuzzkp' AS "Company Name"
+from [AdventureWorks2022].[Person].[Person];
