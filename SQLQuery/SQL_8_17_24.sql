@@ -52,7 +52,7 @@ LEFT JOIN production.ProductModel pm ON pp.ProductModelID = pm.ProductModelID;
  select * from dim_customer;
 
 
- Create view dim_person as
+ Create view dim_salesperson as
  select 
 	sp.BusinessEntityID "SalesPerson Code",
 	sp.TerritoryID,
@@ -69,22 +69,13 @@ LEFT JOIN production.ProductModel pm ON pp.ProductModelID = pm.ProductModelID;
  left join HumanResources.Employee he on sp.BusinessEntityID = he.BusinessEntityID
  left join Person.EmailAddress em on sp.BusinessEntityID = em.BusinessEntityID;
 
-
+ drop view fct_SalesDetail;
  --fct_SalesDetail
 create view fct_SalesDetail as
-select 
-	sod.SalesOrderID,
-	sod.SalesOrderDetailID,
-	cast(soh.OrderDate as Date) OrderDate,
-	cast(soh.shipDate as Date) ShipDate,
-	soh.OnlineOrderFlag,
-	soh.CustomerID,
-	soh.SalesPersonID,
-	soh.TerritoryID,
-	soh.ShipToAddressID,
-	soh.BillToAddressID,
-	sod.OrderQty,sod.UnitPrice,sod.UnitPriceDiscount,sod.LineTotal,
-	soh.SubTotal,soh.TaxAmt,soh.Freight,soh.TotalDue
-from Sales.SalesOrderDetail sod
-left join Sales.SalesOrderHeader soh on sod.SalesOrderID = soh.SalesOrderID
-select * from Sales.SalesOrderDetail where SalesOrderID = '43659'
+select 	SOD.SalesOrderID, 	SOD.SalesOrderDetailID,	CAST(SOH.OrderDate As date) OrderDate, 	CAST(SOH.ShipDate as date) ShipDate,	SOH.OnlineOrderFlag,	SOH.CustomerID, 	SOH.SalespersonID,	SOH.TerritoryID, 	SOH.ShipToAddressID, 	SOH.BillToAddressID, 	SOD.ProductID, 	SOD.OrderQty, 	SOD.UnitPrice, 	SOD.UnitPriceDiscount, 	SOD.UnitPrice - (SOD.UnitPrice * SOD.UnitPriceDiscount) AS "UnitPrice After Discount",	ISNULL(PCH.StandardCost,P.StandardCost) AS "Unit Cost",	SOD.LineTotal AS "SalesAmt", 	(SOD.LineTotal/SOH.SubTotal) * SOH.TaxAmt AS "TaxAmt",	(SOD.LineTotal/SOH.SubTotal) * SOH.Freight AS "FreightAmt"from sales.SalesOrderDetail  SODLEFT JOIN sales.SalesOrderHeader SOH on SOD.SalesOrderID = SOH.SalesOrderIDleft join production.ProductCostHistory PCH on SOD.ProductID = PCH.ProductID ANDSOH.OrderDate between PCH.StartDate and PCH.EndDateleft join production.Product P on P.ProductID = sOd.ProductID
+
+
+select * from fct_SalesDetail;
+
+create view dim_address as
+SELECTbea.AddressID,AT.Name AddressType,bea.BusinessEntityID,    A.AddressLine1,A.AddressLine2,A.City,    SP.Name AS StateProvinceName,ST.Name AS TerritoryName,CR.Name AS Country,ST.[Group] AS Continent,A.PostalCodeFROM Person.BusinessEntityAddress BEALEFT JOIN Person.Address A ON BEA.AddressID = A.AddressIDLEFT JOIN Person.StateProvince SP ON A.StateProvinceID = SP.StateProvinceIDLEFT JOIN Person.CountryRegion CR ON SP.CountryRegionCode = CR.CountryRegionCodeLEFT JOIN Person.AddressType AT ON BEA.AddressTypeID = AT.AddressTypeIDLEFT JOIN Sales.SalesTerritory ST ON SP.TerritoryID = ST.TerritoryID
